@@ -1,0 +1,13 @@
+Vote Button Click
+if !anecdote selected return <p>Select anecdote</p>;
+
+ if anecdote [
+
+global:
+select[*value(string)]
+
+lexical - (anecdoteFX)
+genID[*value(number)]
+ ]
+
+ [Discussion: Determined how to capture current selected item]

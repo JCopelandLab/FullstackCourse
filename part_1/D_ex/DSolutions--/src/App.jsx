@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-//good,neutral,bad: buttons
+//Buttons Component; good, neutral, bad
 const Button = ({ text, onClick }) => <button onClick={onClick}>{text}</button>;
 
-//statistics sections
+//statistics Component
 const Stat = ({ good, neutral, bad, val1, val2, val3 }) => {
   const total = val1 + val2 + val3;
-  const avg = (val1 + val2 + val3) / 3;
+  const avg = (val1 * 1 + val2 * 0 + val3 * -1) / 3;
   const posPercent = (val1 / total) * 100;
 
   if (val1 === 0 && val2 === 0 && val3 === 0) {
@@ -60,6 +60,7 @@ const App = () => {
     6: 0,
     7: 0,
   });
+
   const [neutral, setNeutral] = useState(0);
   const [good, setGood] = useState(0);
   const [bad, setBad] = useState(0);
@@ -75,15 +76,24 @@ const App = () => {
     "The only way to go fast, is to go well.",
   ];
 
-  const voteFX = (val) => {
-    const votesCopy = { ...votes };
-    console.log("clicked vote", votesCopy);
+  const voteFX = () => {
+    let votesObjCopy = { ...votes };
+    let maxValue = 0;
+    if (!selected) return console.log("First, select an anecdote.");
+
+    const anecdoteKey = anecdotes.indexOf(selected);
+    votesObjCopy[anecdoteKey] += 1;
+    const values = Object.values(votesObjCopy);
+
+    setVotes(votesObjCopy);
+    console.log(votesObjCopy);
   };
 
   const anecdoteFX = () => {
     const genID = Math.floor(Math.random() * anecdotes.length);
 
     const match = anecdotes[genID];
+
     setSelected(match);
   };
 
@@ -116,7 +126,6 @@ const App = () => {
         />
       </div>
       <div>
-        <h2>Statistics</h2>
         <Stat
           good={good}
           neutral={neutral}
