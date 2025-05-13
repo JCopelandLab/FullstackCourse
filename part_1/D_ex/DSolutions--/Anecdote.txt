@@ -1,0 +1,9 @@
+Needed Values:
+1. The current displayed Anecdotes votes
+[]
+
+2. The anecdote with the most votes
+[]
+
+3. The highest voted anecdote count
+[]
