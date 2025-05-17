@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-//good,neutral,bad: buttons
+//Buttons Component; good, neutral, bad
 const Button = ({ text, onClick }) => <button onClick={onClick}>{text}</button>;
 
-//statistics sections
+//statistics Component
 const Stat = ({ good, neutral, bad, val1, val2, val3 }) => {
+  //*averageScore (the feedback values are: good 1, neutral 0, bad -1) and the percentage of positive feedback.
   const total = val1 + val2 + val3;
   const avg = (val1 + val2 + val3) / 3;
   const posPercent = (val1 / total) * 100;
@@ -48,22 +49,46 @@ const Stat = ({ good, neutral, bad, val1, val2, val3 }) => {
   );
 };
 
-const App = () => {
-  const [selected, setSelected] = useState(null);
-  const [votes, setVotes] = useState({
-    0: 0,
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-    7: 0,
-  });
-  const [neutral, setNeutral] = useState(0);
-  const [good, setGood] = useState(0);
-  const [bad, setBad] = useState(0);
+const Anecdote = ({
+  selected,
+  votesObj,
+  maxVoteFX,
+  voteKeyFX,
+  anecArr,
+  currAnecVote,
+}) => {
+  //highestVote properties
+  const maxVote = maxVoteFX({ votesObj });
 
+  const popularAnecdote = anecArr[voteKeyFX({ votesObj, maxVote })];
+
+  const anecVote = currAnecVote({ votesObj, selected });
+
+  console.log(anecVote);
+  return (
+    <>
+      <div>
+        <h3>Most Popular Anecdote</h3>
+        <p>
+          {!popularAnecdote ? (
+            "No votes made"
+          ) : (
+            <>
+              <i>{popularAnecdote}</i> <strong>has {maxVote} votes</strong>
+            </>
+          )}
+        </p>
+      </div>
+      <div>
+        <h3>Current Generated Anecdote</h3>
+        <p>
+          <i>{selected}</i> <strong>has {anecVote} votes</strong>
+        </p>
+      </div>
+    </>
+  );
+};
+const App = () => {
   const anecdotes = [
     "If it hurts, do it more often.",
     "Adding manpower to a late software project makes it later!",
@@ -75,16 +100,73 @@ const App = () => {
     "The only way to go fast, is to go well.",
   ];
 
-  const voteFX = (val) => {
-    const votesCopy = { ...votes };
-    console.log("clicked vote", votesCopy);
+  const [votes, setVotes] = useState({
+    0: 0,
+    1: 0,
+    2: 0,
+    3: 0,
+    4: 0,
+    5: 0,
+    6: 0,
+    7: 0,
+  });
+
+  const [selected, setSelected] = useState(null);
+  const [message, setMessage] = useState(null);
+  const [neutral, setNeutral] = useState(0);
+  const [good, setGood] = useState(0);
+  const [bad, setBad] = useState(0);
+  const [maxVote, setMaxVote] = useState(0);
+  const selAnecIndex = anecdotes.indexOf(selected);
+
+  const messageFx = () => {
+    setMessage("Select an Anecdote");
+
+    setTimeout(() => {
+      setMessage(null);
+    }, 1000);
+  };
+
+  //returns max vote
+  const maxVoteFX = ({ votesObj }) => {
+    const highestVote = Math.max(...Object.values(votesObj));
+
+    return highestVote === 0 ? null : highestVote;
+  };
+
+  //returns current Anedote vote
+  const anecVoteFX = ({ votesObj, selected }) => {
+    const allVotes = Object.values(votesObj);
+
+    return allVotes[selAnecIndex];
+  };
+
+  //returns the key of the highest vote
+  const voteKeyFX = ({ votesObj, maxVote }) => {
+    const values = Object.values(votesObj);
+
+    return values.indexOf(maxVote);
+  };
+
+  const voteFX = () => {
+    let votesObjCopy = { ...votes };
+
+    if (!selected) {
+      return messageFx();
+    }
+
+    votesObjCopy[selAnecIndex] += 1;
+    setVotes(votesObjCopy);
+    const values = Object.values(votesObjCopy);
+    setMaxVote(Math.max(...values));
+
+    console.log(maxVote);
   };
 
   const anecdoteFX = () => {
     const genID = Math.floor(Math.random() * anecdotes.length);
 
-    const match = anecdotes[genID];
-    setSelected(match);
+    setSelected(anecdotes[genID]);
   };
 
   const newValue = (callback, num) => {
@@ -92,10 +174,32 @@ const App = () => {
     callback(newValue);
   };
 
+  const elementStyles = {
+    header: {
+      background: "red",
+      color: "yellow",
+      padding: "5px",
+    },
+    mainContainer: {
+      border: "1px solid black",
+      padding: "12px",
+    },
+    statConfig: {
+      border: "2px solid blue",
+      padding: "5px",
+      margin: "2px",
+    },
+    contentPanel: {
+      border: "1px solid black",
+      padding: "10px 5px 5px 10px",
+      margin: "5px",
+    },
+  };
+
   return (
-    <div>
-      <h1>Give Feedback</h1>
-      <div>
+    <div style={elementStyles.mainContainer}>
+      <h1 style={elementStyles.header}>Give Feedback</h1>
+      <div style={elementStyles.statConfig}>
         <Button
           text="Good"
           onClick={() => {
@@ -114,22 +218,36 @@ const App = () => {
             newValue(setBad, bad);
           }}
         />
+
+        <div>
+          <Stat
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            val1={good}
+            val2={neutral}
+            val3={bad}
+          />
+        </div>
       </div>
       <div>
-        <h2>Statistics</h2>
-        <Stat
-          good={good}
-          neutral={neutral}
-          bad={bad}
-          val1={good}
-          val2={neutral}
-          val3={bad}
-        />
-      </div>
-      <div>
-        <p>{selected}</p>
-        <button onClick={anecdoteFX}>Select Anecdote</button>
-        <button onClick={voteFX}>Vote</button>
+        <div style={elementStyles.statConfig}>
+          <button onClick={anecdoteFX}>
+            {!selected ? "Select Anecdote" : "Next Anecdote"}
+          </button>
+          <button onClick={voteFX}>Vote</button>
+          {<p>{message}</p>}
+          {!selected ? null : (
+            <Anecdote
+              selected={selected}
+              votesObj={votes}
+              maxVoteFX={maxVoteFX}
+              voteKeyFX={voteKeyFX}
+              anecArr={anecdotes}
+              currAnecVote={anecVoteFX}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
