@@ -1,56 +1,25 @@
 import Course from "./d_modules/Course";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import "./App.css";
 
 function App() {
-  const courses = [
-    {
-      name: "Half Stack application development",
-      id: 1,
-      parts: [
-        {
-          name: "Fundamentals of React",
-          exercises: 10,
-          id: 1,
-        },
-        {
-          name: "Using props to pass data",
-          exercises: 7,
-          id: 2,
-        },
-        {
-          name: "State of a component",
-          exercises: 14,
-          id: 3,
-        },
-        {
-          name: "Redux",
-          exercises: 11,
-          id: 4,
-        },
-      ],
-    },
-    {
-      name: "Node.js",
-      id: 2,
-      parts: [
-        {
-          name: "Routing",
-          exercises: 3,
-          id: 1,
-        },
-        {
-          name: "Middlewares",
-          exercises: 7,
-          id: 2,
-        },
-      ],
-    },
-  ];
+  const [data, setData] = useState([]);
+
+  const hook = () => {
+    console.log("Effect");
+    axios.get("http://localhost:3001/courses").then((response) => {
+      console.log("promise fulfilled");
+      setData(response.data);
+    });
+  };
+
+  useEffect(hook, []);
 
   return (
     <div>
       <h1>OSINT Bot Raid </h1>
-      <Course courses={courses} />
+      <Course data={data} />
     </div>
   );
 }

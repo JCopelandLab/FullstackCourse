@@ -1,33 +1,31 @@
-const Course = ({ courses }) => {
-  const contentBundle = courses.map((i) => {
+const Course = ({ data }) => {
+  return data.map((i) => {
     return (
-      <div>
-        <h1 key={i.id}>{i.name}</h1>
-        {i.parts.map((i) => {
-          return (
-            <div>
-              <ul key={i.id}>
-                {i.name} has {i.exercises} exercises
-              </ul>
-            </div>
-          );
-        })}
-        <div>
-          <strong>
-            <p>
-              Total of{" "}
-              {i.parts.reduce((sum, i) => {
-                return sum + i.exercises;
-              }, 0)}{" "}
-              exercises
-            </p>
-          </strong>
+      <>
+        <h1 key={i.name}>{i.name}</h1>
+        <div key={i.id}>
+          {i.parts.map((i) => {
+            return (
+              <div key={i.id + i.name}>
+                <ul key={i.name}>
+                  {i.name} has {i.exercises} exercises
+                </ul>
+              </div>
+            );
+          })}
         </div>
-      </div>
+        <p>
+          <strong>
+            Total of{" "}
+            {i.parts.reduce((sum, i) => {
+              return sum + i.exercises;
+            }, 0)}{" "}
+            exercises
+          </strong>
+        </p>
+      </>
     );
   });
-
-  return contentBundle;
 };
 
 export default Course;
