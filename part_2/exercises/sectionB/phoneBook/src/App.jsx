@@ -1,22 +1,20 @@
 import { useEffect, useState } from "react";
 import Contact from "./modules/Contact";
 import Form from "./modules/Form";
+import axios from "axios";
 import "./App.css";
 
-const contactList = [
-  { name: "Arto Hellas", number: "040-123456", id: 1, important: true },
-  { name: "Ada Lovelace", number: "39-44-5323523", id: 2, important: false },
-  { name: "Dan Abramov", number: "12-43-234345", id: 3, important: true },
-  {
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-    id: 4,
-    important: false,
-  },
-];
-
 function App() {
-  const [contacts, setContacts] = useState(contactList);
+  const [contacts, setContacts] = useState([]);
+
+  const hook = () => {
+    console.log("render requested");
+    axios.get("http://localhost:3001/contactList").then((response) => {
+      console.log("data request fulfilled");
+      setContacts(response.data);
+    });
+  };
+  useEffect(hook, []);
 
   const [newNumber, setNewNumber] = useState(undefined);
   const [newName, setNewName] = useState(undefined);
